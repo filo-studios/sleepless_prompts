@@ -308,6 +308,13 @@ function keybind.watch(name)
     local state = { down = false, pressed = false, released = false }
     states[name] = state
 
+    -- Don't take over a keybind another resource already registered (e.g. via lib.addKeybind);
+    -- re-registering the command would replace that resource's handler.
+    local command = '+' .. name
+    for _, registered in ipairs(GetRegisteredCommands()) do
+        if registered.name == command then return end
+    end
+
     RegisterCommand('+' .. name, function()
         if IsPauseMenuActive() then return end
         state.pressed = true
